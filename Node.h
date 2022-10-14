@@ -1,10 +1,9 @@
 #include <string>
 #include <vector>
 using namespace std;
-typedef vector<int> intvec;
 struct Node
 {
-    intvec coordinates;
+    string coordinates;
     bool end = false;
     string question = "Question not exist\n";
     Node *No;
@@ -13,16 +12,14 @@ struct Node
     {
         question = Question + "\n";
     }
-    Node(string Question, bool yesno)
+    Node(string Question, string yesno)
     {
-        coordinates = this->coordinates;
-        coordinates.push_back(yesno);
+        coordinates = this->coordinates + yesno;
         question = Question + "\n";
     }
-    Node(bool isEnd, string Answer, bool yesno)
+    Node(bool isEnd, string Answer, string yesno)
     {
-        coordinates = this->coordinates;
-        coordinates.push_back(yesno);
+        coordinates = this->coordinates + yesno;
         end = true;
         question = Answer + "\n";
     }
