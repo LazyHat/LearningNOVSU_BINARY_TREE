@@ -6,6 +6,7 @@
 #include <map>
 #include <Windows.h>
 #include "Node.h"
+#define SIZE_OF_FILE_BUFF_TO_INT 20
 using namespace std;
 
 enum Language
@@ -21,6 +22,8 @@ Language language = English;
 #pragma endregion
 #pragma region FUNCTIONS
 #pragma region PROTOTYPES
+string InputStr();
+int StrToInt(string s);
 #pragma endregion
 #pragma region DATABASE
 void AddToDic(string Coordinates, Node Object)
@@ -79,31 +82,20 @@ void PrintSL(string literal, int amountofS)
 }
 int InputInt()
 {
-    int a;
-    bool fail = 0;
     do
     {
-        try
-        {
-            a = stoi(InputStr());
-        }
-        catch (std::invalid_argument e)
-        {
-            PrintS("Не удалось преобразовать строку в число, попробуйте еще раз: ");
-            fail = true;
-        }
-        catch (std::out_of_range e)
-        {
-            PrintS("Слишком большое число, попробуйте еще раз: ");
-            fail = true;
-        }
-    } while (fail);
-    return a;
+        int a = 0;
+        a = StrToInt(InputStr());
+        if (a == -999999)
+            PrintS("Попробуйте еще раз: ");
+        else
+            return a;
+    } while (true);
 }
 string InputStr()
 {
     string s;
-    cin >> s;
+    getline(cin >> ws, s);
     return s;
 }
 char InputChar()
@@ -125,18 +117,19 @@ string InputCoordinates()
 {
     string d = ".01";
     string s = InputStr();
-    for (int i = 0, t = 0; i < s.size(); i++, t = 0)
+    int t = 0;
+    for (int i = 0; i < s.size(); i++)
     {
         for (int j = 0; j < d.size(); j++)
         {
             if (s[i] == d[j])
                 t++;
         }
-        if (t < s.size() || !s.starts_with(d[0]))
-        {
-            PrintS("Некорректные координаты. Введите корректные: ");
-            return InputCoordinates();
-        }
+    }
+    if (t < s.size() || !s.starts_with(d[0]))
+    {
+        PrintS("Некорректные координаты. Введите корректные: ");
+        return InputCoordinates();
     }
     return s;
 }
@@ -180,6 +173,25 @@ void PrintMenu(string head, list<string> ListMenu)
 }
 #pragma endregion
 #pragma region CONVERT
+int StrToInt(string s)
+{
+    try
+    {
+        int a;
+        a = stoi(s);
+        return a;
+    }
+    catch (std::invalid_argument e)
+    {
+        PrintSL("Не удалось преобразовать String в Int.");
+        return -999999;
+    }
+    catch (std::out_of_range e)
+    {
+        PrintSL("Не удалось преобразовать String в Int.");
+        return -999999;
+    }
+}
 #pragma endregion
 #pragma region EDITTREE
 void EditNode(string coordinates)
@@ -202,7 +214,6 @@ void EditNode(string coordinates)
         }
         else
         {
-            menulist.push_front("Type of Node: " + q_a2);
             if (currentnode.end)
             {
                 q_a1 = "Answer(P.S. or enter new Question)";
@@ -217,11 +228,12 @@ void EditNode(string coordinates)
                 menulist.push_back("If yes: " + GetNodeFromDic(coordinates + "1").question);
                 menulist.push_back("If No: " + GetNodeFromDic(coordinates + "0").question);
             }
+            menulist.push_front("Type of Node: " + q_a2);
             list<string>::iterator iter = menulist.begin();
             menulist.insert(++iter, q_a2 + ": " + currentnode.question);
             chooselist.push_front("Edit " + q_a1);
         }
-        chooselist.push_back("Go up the tree");
+        chooselist.insert(++chooselist.begin(), "Go up the tree");
         chooselist.push_back("Exit Menu");
 
         PrintMenu("ThisNode(" + coordinates + ")", menulist);
@@ -233,19 +245,13 @@ void EditNode(string coordinates)
             currentnode = Node(InputStr());
             break;
         case 2:
-            if (currentnode.end)
-            {
-                string _coords = coordinates;
-                _coords.pop_back();
-                NextCoords = _coords;
-                k = false;
-            }
-            else
-            {
-                k = false;
-                NextCoords = coordinates + "1";
-            }
-            break;
+        {
+            string _coords = coordinates;
+            _coords.pop_back();
+            NextCoords = _coords;
+            k = false;
+        }
+        break;
         case 3:
             if (currentnode.end)
             {
@@ -254,7 +260,7 @@ void EditNode(string coordinates)
             else
             {
                 k = false;
-                NextCoords = coordinates + "0";
+                NextCoords = coordinates + "1";
             }
             break;
         case 4:
@@ -267,10 +273,8 @@ void EditNode(string coordinates)
             }
             else
             {
-                string _coords = coordinates;
-                _coords.pop_back();
-                NextCoords = _coords;
                 k = false;
+                NextCoords = coordinates + "0";
             }
         }
         break;
@@ -296,22 +300,55 @@ void EditNode(string coordinates)
 }
 #pragma endregion
 #pragma region FILE
-int SaveToFile()
+void SaveToFile()
 {
     ofstream fout("tree.txt");
     if (!fout.is_open())
     {
         PrintSL("Не удалось открыть файл");
-        return -1;
     }
     else
     {
+        fout << db.size() << "\n";
         for (auto element : db)
         {
             fout << element.first << " " << element.second.question << "\n";
         }
         fout.close();
-        return 0;
+        PrintSL("Данные всех узлов были успешно записаны в файл");
+    }
+}
+void LoadFile()
+{
+    ifstream fin("tree.txt");
+    if (!fin.is_open())
+    {
+        PrintSL("Не удалось открыть файл");
+    }
+    else
+    {
+        int amountofnodes;
+        string s, fcoords, fquest;
+        getline(fin, s);
+        int space = 0;
+        amountofnodes = StrToInt(s);
+        if (amountofnodes != 0)
+            db.clear();
+        while (true)
+        {
+            s = "";
+            getline(fin, s);
+            if (s == "")
+                break;
+            space = s.find(" ");
+            fcoords = s.substr(0, space);
+            fquest = s.substr(space);
+            AddToDic(fcoords, Node(fquest));
+        }
+        if (db.size() == amountofnodes)
+            PrintSL("Данные всех узлов были успешно загружены!");
+        else
+            PrintSL("Потеря данных");
     }
 }
 #pragma endregion
@@ -378,9 +415,9 @@ int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-    cout << "Дарова\n";
+    PrintSL("Добрый ветер!");
+    LoadFile();
     while (HeadMenu())
         ;
-    if (SaveToFile() == 0)
-        PrintSL("Данные были успещно записаны в файл");
+    SaveToFile();
 }
