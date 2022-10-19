@@ -1,19 +1,28 @@
 #include <iostream>
 #include <fstream>
 #include <iterator>
+#include <cstdio>
 #include <list>
 #include <map>
+#include <Windows.h>
 #include "Node.h"
 using namespace std;
+
+enum Language
+{
+    Russian,
+    English
+};
 typedef map<string, Node> Dic;
+typedef map<string, string[]> locale;
 #pragma region OBJECTS
-ofstream fo;
 Dic db;
+Language language = English;
 #pragma endregion
 #pragma region FUNCTIONS
 #pragma region PROTOTYPES
 #pragma endregion
-#pragma region SETTERS_AND_GETTERS
+#pragma region DATABASE
 void AddToDic(string Coordinates, Node Object)
 {
     db.insert(Dic::value_type(Coordinates, Object));
@@ -26,7 +35,7 @@ Node GetNodeFromDic(string Coordinates)
     }
     else
     {
-        return Node("0.Node whose coords are:" + Coordinates + " does not exist.");
+        return Node("0.Узла с координатами: (" + Coordinates + ") не существует.");
     }
 }
 void ReplaceItemDic(string Coordinates, Node Object)
@@ -71,13 +80,30 @@ void PrintSL(string literal, int amountofS)
 int InputInt()
 {
     int a;
-    cin >> a;
+    bool fail = 0;
+    do
+    {
+        try
+        {
+            a = stoi(InputStr());
+        }
+        catch (std::invalid_argument e)
+        {
+            PrintS("Не удалось преобразовать строку в число, попробуйте еще раз: ");
+            fail = true;
+        }
+        catch (std::out_of_range e)
+        {
+            PrintS("Слишком большое число, попробуйте еще раз: ");
+            fail = true;
+        }
+    } while (fail);
     return a;
 }
 string InputStr()
 {
     string s;
-    getline(cin >> ws, s);
+    cin >> s;
     return s;
 }
 char InputChar()
@@ -86,14 +112,33 @@ char InputChar()
     cin >> c;
     return c;
 }
-string InputChary_n()
+bool InputStrC()
 {
-    string c;
-    cin >> c;
-    if (c == "da" || c == "net")
-        return c;
-    PrintSL("Incorrect answer, enter correct answer!");
-    return InputChary_n();
+    PrintS("(дa/нет): ");
+    string c = InputStr();
+    if (c == "да" || c == "нет")
+        return c == "да";
+    PrintSL("Некорректный ввод, попробуйте еще раз!");
+    return InputStrC();
+}
+string InputCoordinates()
+{
+    string d = ".01";
+    string s = InputStr();
+    for (int i = 0, t = 0; i < s.size(); i++, t = 0)
+    {
+        for (int j = 0; j < d.size(); j++)
+        {
+            if (s[i] == d[j])
+                t++;
+        }
+        if (t < s.size() || !s.starts_with(d[0]))
+        {
+            PrintS("Некорректные координаты. Введите корректные: ");
+            return InputCoordinates();
+        }
+    }
+    return s;
 }
 int PrintMenuAndChoose(string head, list<string> ListMenu)
 {
@@ -144,25 +189,47 @@ void EditNode(string coordinates)
     bool k = true;
     do
     {
-        string q_a = (currentnode.end ? "Answer(P.S. or enter new Question)" : "Question(P.S. or enter new Answer)");
-        list<string> menulist = {"Type of Node: " + q_a,
-                                 q_a + ": " + currentnode.question};
-        list<string> chooselist = {"Edit " + q_a,
-                                   "Go up the tree",
-                                   "Exit Menu"};
-        if (!currentnode.end)
+        list<string> menulist = {};
+        list<string> chooselist = {};
+        bool nonenode = currentnode.question.starts_with("0");
+        string q_a1 = "";
+        string q_a2 = "";
+        if (nonenode)
         {
-            chooselist.push_back("Go to Yes");
-            chooselist.push_back("Go to No");
-            menulist.push_back("If yes: " + GetNodeFromDic(coordinates + "1").question);
-            menulist.push_back("If No: " + GetNodeFromDic(coordinates + "0").question);
+            q_a1 = "Вопрос/Ответ";
+            menulist.push_front("Node does not exist");
+            chooselist.push_back("Create Question/Answer (Create Node)");
         }
+        else
+        {
+            menulist.push_front("Type of Node: " + q_a2);
+            if (currentnode.end)
+            {
+                q_a1 = "Answer(P.S. or enter new Question)";
+                q_a2 = "Answer";
+            }
+            else
+            {
+                q_a1 = "Question(P.S. or enter new Answer)";
+                q_a2 = "Question";
+                chooselist.push_back("Go to Yes");
+                chooselist.push_back("Go to No");
+                menulist.push_back("If yes: " + GetNodeFromDic(coordinates + "1").question);
+                menulist.push_back("If No: " + GetNodeFromDic(coordinates + "0").question);
+            }
+            list<string>::iterator iter = menulist.begin();
+            menulist.insert(++iter, q_a2 + ": " + currentnode.question);
+            chooselist.push_front("Edit " + q_a1);
+        }
+        chooselist.push_back("Go up the tree");
+        chooselist.push_back("Exit Menu");
+
         PrintMenu("ThisNode(" + coordinates + ")", menulist);
-        // РњРѕР¶РµС‚ СЃРґРµР»Р°С‚СЊ РјРµРЅСЋ, РІС‹Р±РѕСЂ С‡С‚Рѕ РїРѕРјРµРЅСЏС‚СЊ
+        // Может сделать меню, выбор что поменять
         switch (PrintMenuAndChoose("EditNodeMenu", chooselist))
         {
         case 1:
-            PrintS("Enter new " + q_a + ": ");
+            PrintS("Enter new " + q_a1 + ": ");
             currentnode = Node(InputStr());
             break;
         case 2:
@@ -219,11 +286,6 @@ void EditNode(string coordinates)
                 k = false;
             }
             break;
-        default:
-            PrintSL("Exist item");
-            k = false;
-            NextCoords = coordinates;
-            break;
         }
     } while (k);
     ReplaceItemDic(coordinates, currentnode);
@@ -233,64 +295,92 @@ void EditNode(string coordinates)
     }
 }
 #pragma endregion
+#pragma region FILE
+int SaveToFile()
+{
+    ofstream fout("tree.txt");
+    if (!fout.is_open())
+    {
+        PrintSL("Не удалось открыть файл");
+        return -1;
+    }
+    else
+    {
+        for (auto element : db)
+        {
+            fout << element.first << " " << element.second.question << "\n";
+        }
+        fout.close();
+        return 0;
+    }
+}
+#pragma endregion
 void Begin()
 {
-    string answer;
+    bool answer;
     Node node = GetNodeFromDic(".");
     string coordinates = ".";
     while (!node.end)
     {
-        PrintS(node.question + "(da/net): ");
-        answer = InputChary_n();
-        if (answer == "da")
+        PrintS(node.question);
+        answer = InputStrC();
+        if (answer)
         {
             coordinates += "1";
         }
-        else if (answer == "net") // answer = 'n'
+        else // answer = 'n'
         {
             coordinates += "0";
         }
         node = GetNodeFromDic(coordinates);
     }
-    PrintS("Your animal: " + node.question + "\nIts a correct answer?(da/net): ");
-    answer = InputChary_n();
-    if (answer == "da")
+    PrintS("Your animal: " + node.question + "\nIts a correct answer?");
+    answer = InputStrC();
+    if (answer)
     {
         PrintSL("I win");
     }
-    else if (answer == "net")
+    else
     {
-        PrintS("Are you want to edit this node?(da/net): ");
-        if (InputChary_n() == "da")
+        PrintS("Are you want to edit this node?");
+        if (InputStrC())
         {
             EditNode(coordinates);
         }
     }
 }
-//РЅР°РґРѕ СЃРґРµР»Р°С‚СЊ С‡С‚РѕР±С‹ РЅРµ РєРѕРѕСЂРґРёРЅР°С‚Сѓ РІРІРѕРґРёС‚СЊ,
-//Р° РєР°Рє С‚Рѕ СЃРІСЏР·Р°С‚СЊ СЃ РёРіСЂРѕР№, С‡С‚РѕР±С‹ РјРѕР¶РЅРѕ Р±С‹Р»Рѕ РґРѕР±Р°РІРёС‚СЊ СѓР·РµР» РїСЂСЏРјРѕ РІ РёРіСЂРµ. СЃРґРµР»Р°С‚СЊ С‚РёРїРѕ РјР°СЃС‚РµСЂР° СЃРѕР·РґР°РЅРёСЏ СѓР·Р»РѕРІ.
-void HeadMenu()
+//надо сделать чтобы не координату вводить,
+//а как то связать с игрой, чтобы можно было добавить узел прямо в игре. сделать типо мастера создания узлов
+
+int HeadMenu()
 {
     switch (PrintMenuAndChoose("MENU",
                                {"Play a game",
-                                "Edit tree"}))
+                                "Edit tree",
+                                "Exit"}))
     {
     case 1: // Play a game
         Begin();
         break;
     case 2: // Edit tree
         PrintS("Enter coordinates of node: ");
-        EditNode(InputStr());
+        EditNode(InputCoordinates());
         break;
-    default:
+    case 3:
+        return 0;
         break;
     }
+    return 1;
 }
 #pragma endregion
 
 int main()
 {
-    cout << "Hello World\n";
-    while (true)
-        HeadMenu();
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    cout << "Дарова\n";
+    while (HeadMenu())
+        ;
+    if (SaveToFile() == 0)
+        PrintSL("Данные были успещно записаны в файл");
 }

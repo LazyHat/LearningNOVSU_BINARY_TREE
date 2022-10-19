@@ -6,6 +6,7 @@
     "string": "cpp",
     "map": "cpp",
     "list": "cpp",
-    "utility": "cpp"
+    "utility": "cpp",
+    "stdexcept": "cpp"
   }
 }
