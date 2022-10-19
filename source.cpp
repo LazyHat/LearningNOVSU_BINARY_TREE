@@ -237,7 +237,6 @@ void EditNode(string coordinates)
         chooselist.push_back("Exit Menu");
 
         PrintMenu("ThisNode(" + coordinates + ")", menulist);
-        // Может сделать меню, выбор что поменять
         switch (PrintMenuAndChoose("EditNodeMenu", chooselist))
         {
         case 1:
@@ -328,7 +327,7 @@ void LoadFile()
     else
     {
         int amountofnodes;
-        string s, fcoords, fquest;
+        string s;
         getline(fin, s);
         int space = 0;
         amountofnodes = StrToInt(s);
@@ -341,9 +340,7 @@ void LoadFile()
             if (s == "")
                 break;
             space = s.find(" ");
-            fcoords = s.substr(0, space);
-            fquest = s.substr(space);
-            AddToDic(fcoords, Node(fquest));
+            AddToDic(s.substr(0, space), Node(s.substr(space)));
         }
         if (db.size() == amountofnodes)
             PrintSL("Данные всех узлов были успешно загружены!");
@@ -386,8 +383,6 @@ void Begin()
         }
     }
 }
-//надо сделать чтобы не координату вводить,
-//а как то связать с игрой, чтобы можно было добавить узел прямо в игре. сделать типо мастера создания узлов
 
 int HeadMenu()
 {
