@@ -7,25 +7,38 @@
 #include <Windows.h>
 #include "Node.h"
 #define SIZE_OF_FILE_BUFF_TO_INT 20
+// Files
+#define FILE_TREE "tree.txt"
+#define FILE_CONFIG "config.txt"
+#define FILE_LOCALE "locale.txt"
+//
 using namespace std;
 
 enum Language
 {
-    Russian,
-    English
+    English,
+    Russian
 };
 typedef map<string, Node> Dic;
-typedef map<string, string[]> locale;
+typedef map<pair<string, Language>, string> LocaleDic;
+#pragma region GLOBAL_VAR
+Language glanguage;
+#pragma endregion
 #pragma region OBJECTS
 Dic db;
-Language language = English;
+LocaleDic localedb;
 #pragma endregion
 #pragma region FUNCTIONS
 #pragma region PROTOTYPES
+string GetWord(string wordid);
 string InputStr();
 int StrToInt(string s);
 #pragma endregion
 #pragma region DATABASE
+void AddToLocaleDic(string wordid, Language lang, string word)
+{
+    localedb.insert(LocaleDic::value_type(make_pair(wordid, lang), word));
+}
 void AddToDic(string Coordinates, Node Object)
 {
     db.insert(Dic::value_type(Coordinates, Object));
@@ -38,7 +51,7 @@ Node GetNodeFromDic(string Coordinates)
     }
     else
     {
-        return Node("0.Узла с координатами: (" + Coordinates + ") не существует.");
+        return Node(GetWord("GetNodeFromDic_NodeExist_Part_1") + " " + Coordinates + " " + GetWord("GetNodeFromDic_NodeExist_Part_2"));
     }
 }
 void ReplaceItemDic(string Coordinates, Node Object)
@@ -87,7 +100,7 @@ int InputInt()
         int a = 0;
         a = StrToInt(InputStr());
         if (a == -999999)
-            PrintS("Попробуйте еще раз: ");
+            PrintS(GetWord("InputInt_Error") + " ");
         else
             return a;
     } while (true);
@@ -106,11 +119,11 @@ char InputChar()
 }
 bool InputStrC()
 {
-    PrintS("(дa/нет): ");
+    PrintS(GetWord("(yes/no)"));
     string c = InputStr();
-    if (c == "да" || c == "нет")
-        return c == "да";
-    PrintSL("Некорректный ввод, попробуйте еще раз!");
+    if (c == GetWord("yes") || c == GetWord("no"))
+        return c == GetWord("yes");
+    PrintSL(GetWord("InputStrC_Incorrect"));
     return InputStrC();
 }
 string InputCoordinates()
@@ -128,7 +141,7 @@ string InputCoordinates()
     }
     if (t < s.size() || !s.starts_with(d[0]))
     {
-        PrintS("Некорректные координаты. Введите корректные: ");
+        PrintS(GetWord("InputCoordinates_Incorrect") + " ");
         return InputCoordinates();
     }
     return s;
@@ -150,7 +163,7 @@ int PrintMenuAndChoose(string head, list<string> ListMenu)
     }
     //  EndMenu
     PrintSL("-", 10 + head.size());
-    PrintS("Choose: ");
+    PrintS(GetWord("PrintMenuAndChoose_Choose") + " ");
     return InputInt();
 }
 void PrintMenu(string head, list<string> ListMenu)
@@ -183,12 +196,12 @@ int StrToInt(string s)
     }
     catch (std::invalid_argument e)
     {
-        PrintSL("Не удалось преобразовать String в Int.");
+        PrintSL(GetWord("StrToInt_Fail_Convert"));
         return -999999;
     }
     catch (std::out_of_range e)
     {
-        PrintSL("Не удалось преобразовать String в Int.");
+        PrintSL(GetWord("StrToInt_Fail_Convert"));
         return -999999;
     }
 }
@@ -208,21 +221,21 @@ void EditNode(string coordinates)
         string q_a2 = "";
         if (nonenode)
         {
-            q_a1 = "Вопрос/Ответ";
-            menulist.push_front("Node does not exist");
-            chooselist.push_back("Create Question/Answer (Create Node)");
+            q_a1 = GetWord("EditNode_Q/A");
+            menulist.push_front(GetWord("EditNode_Node_Exist"));
+            chooselist.push_back(GetWord("EditNode_Create_Q/A"));
         }
         else
         {
             if (currentnode.end)
             {
-                q_a1 = "Answer(P.S. or enter new Question)";
-                q_a2 = "Answer";
+                q_a1 = GetWord("EditNode_A_PS");
+                q_a2 = GetWord("Answer");
             }
             else
             {
-                q_a1 = "Question(P.S. or enter new Answer)";
-                q_a2 = "Question";
+                q_a1 = GetWord("EditNode_Q_PS");
+                q_a2 = GetWord("Answer");
                 chooselist.push_back("Go to Yes");
                 chooselist.push_back("Go to No");
                 menulist.push_back("If yes: " + GetNodeFromDic(coordinates + "1").question);
@@ -298,8 +311,145 @@ void EditNode(string coordinates)
     }
 }
 #pragma endregion
+#pragma region Locale
+void AddLocaleList()
+{
+    AddToLocaleDic("GetNodeFromDic_NodeExist_Part_1", English, "Node whoose cords are:");
+    AddToLocaleDic("GetNodeFromDic_NodeExist_Part_2", English, "Does not exist.");
+    AddToLocaleDic("InputInt_Error", English, "Enter again:");
+    AddToLocaleDic("(yes/no)", English, "(yes/no)");
+    AddToLocaleDic("yes", English, "yes");
+    AddToLocaleDic("no", English, "no");
+    AddToLocaleDic("InputStrC_Incorrect", English, "Incorrect input, enter again!");
+    AddToLocaleDic("InputCoordinates_Incorrect", English, "Incorrect coordinates. Enter again:");
+    AddToLocaleDic("PrintMenuAndChoose_Choose", English, "Choose:");
+    AddToLocaleDic("StrToInt_Fail_Convert", English, "Failed to convert str to int.");
+    AddToLocaleDic("EditNode_Q/A", English, "Question/Answer");
+    AddToLocaleDic("EditNode_Node_Exist", English, "Node does not exist");
+    AddToLocaleDic("EditNode_Create_Q/A", English, "Create Question/Answer (Create Node)");
+    AddToLocaleDic("EditNode_A_PS", English, "Answer(P.S. or enter new Question)");
+    AddToLocaleDic("EditNode_Q_PS", English, "Question(P.S. or enter new Answer)");
+    AddToLocaleDic("Question", English, "Question");
+    AddToLocaleDic("Answer", English, "Answer");
+    AddToLocaleDic("no", English, "no");
+    AddToLocaleDic("no", English, "no");
+    AddToLocaleDic("no", English, "no");
+}
+string GetWord(string wordid)
+{
+    if (localedb.contains(make_pair(wordid, glanguage)))
+        return localedb[make_pair(wordid, glanguage)];
+    else
+        return localedb[make_pair(wordid, English)];
+}
+#pragma endregion
 #pragma region FILE
-void SaveToFile()
+void ErrorConfigFile()
+{
+    PrintS("Файл: ");
+    PrintS(FILE_CONFIG);
+    PrintSL(" Не был найден, или в нем есть ошибка. Создание или изменение файла по шаблону");
+    ofstream fout(FILE_CONFIG);
+    fout << "//CONFIGURATION FILE\n"
+         << "StartLanguage: English\n"
+         << "ENDCONFIG\n";
+    glanguage = English;
+}
+void LoadConfigFile()
+{
+    ifstream fin(FILE_CONFIG);
+    if (fin.is_open())
+    {
+        PrintS("Обнаружен файл: ");
+        PrintSL(FILE_CONFIG);
+        string s;
+        int amountconfig = 1;
+        do
+        {
+            getline(fin, s);
+            if (s.starts_with("//"))
+            {
+                continue;
+            }
+            else if (s.starts_with("StartLanguage:"))
+            {
+                if (s.find("English") != string::npos)
+                {
+                    PrintSL("Language: English");
+                    glanguage = English;
+                    amountconfig--;
+                }
+                else if (s.find("Russian") != string::npos)
+                {
+                    PrintSL("Язык: Русский");
+                    glanguage = Russian;
+                    amountconfig--;
+                }
+            }
+            else if (s.find("ENDCONFIG") != string::npos)
+            {
+                if (amountconfig == 0)
+                {
+                    PrintSL("Конфигурационный файл успешно считан.");
+                    break;
+                }
+                else
+                {
+                    ErrorConfigFile();
+                    break;
+                }
+            }
+            else
+            {
+                ErrorConfigFile();
+                break;
+            }
+        } while (true);
+    }
+    else
+    {
+        ErrorConfigFile();
+    }
+}
+void LoadLocalizationFile()
+{
+    ifstream fin(FILE_LOCALE);
+    if (!fin.is_open())
+    {
+        PrintS("Файл: ");
+        PrintS(FILE_LOCALE);
+        PrintSL(" Не был найден.");
+    }
+    else
+    {
+        PrintS("Обнаружен файл: ");
+        PrintSL(FILE_LOCALE);
+        string s;
+        do
+        {
+            getline(fin, s);
+            if (s.find("//") != string::npos)
+            {
+                continue;
+            }
+            else if (s.find("Language:") != string::npos)
+            {
+                if (s.find("Russian") != string::npos)
+                {
+                    PrintSL("Русская локализация найдена");
+                    getline(fin, s);
+                }
+                break;
+            }
+            else
+            {
+                PrintSL("Локализаций не было найдено, использование English");
+                break;
+            }
+        } while (true);
+    }
+}
+void SaveToTreeFile()
 {
     ofstream fout("tree.txt");
     if (!fout.is_open())
@@ -317,7 +467,7 @@ void SaveToFile()
         PrintSL("Данные всех узлов были успешно записаны в файл");
     }
 }
-void LoadFile()
+void LoadTreeFile()
 {
     ifstream fin("tree.txt");
     if (!fin.is_open())
@@ -333,7 +483,7 @@ void LoadFile()
         amountofnodes = StrToInt(s);
         if (amountofnodes != 0)
             db.clear();
-        while (true)
+        for (int i = 0; i < amountofnodes; i++)
         {
             s = "";
             getline(fin, s);
@@ -343,7 +493,7 @@ void LoadFile()
             AddToDic(s.substr(0, space), Node(s.substr(space)));
         }
         if (db.size() == amountofnodes)
-            PrintSL("Данные всех узлов были успешно загружены!");
+            PrintSL("Данные " + to_string(amountofnodes) + " узлов были успешно загружены!");
         else
             PrintSL("Потеря данных");
     }
@@ -383,7 +533,6 @@ void Begin()
         }
     }
 }
-
 int HeadMenu()
 {
     switch (PrintMenuAndChoose("MENU",
@@ -410,9 +559,12 @@ int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
+    LoadConfigFile();
+    AddLocaleList();
+    LoadLocalizationFile();
+    LoadTreeFile();
     PrintSL("Добрый ветер!");
-    LoadFile();
     while (HeadMenu())
         ;
-    SaveToFile();
+    SaveToTreeFile();
 }
