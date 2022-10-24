@@ -1,0 +1,121 @@
+Language:English
+(yes/no):(yes/no)
+Begin_Animal_Part_1:Your animal
+Begin_Animal_Part_2:Its a correct answer?
+Begin_Edit:Are you want to edit this node?
+Begin_Win:I win
+EditNode_A_PS:Answer(P.S. or enter new Question)
+EditNode_Answer:Answer
+EditNode_Create_Q/A:Create Question/Answer (Create Node)
+EditNode_Edit:Edit
+EditNode_Edit_Node_Menu:EditNodeMenu
+EditNode_Enter_New:Enter new
+EditNode_Exist_Item:Exist item
+EditNode_Exit_Menu:Exit Menu
+EditNode_Go_To_No:Go to no
+EditNode_Go_To_Yes:Go to yes
+EditNode_Go_Up_The_Tree:Go up the tree
+EditNode_If_No:If no
+EditNode_If_Yes:If yes
+EditNode_Node_Exist:Node does not exist
+EditNode_Q/A:Question/Answer
+EditNode_Q_PS:Question(P.S. or enter new Answer)
+EditNode_Question:Question
+EditNode_This_Node:ThisNode
+EditNode_Type_Of_Node:Type of node
+ErrorConfigFile_File_Change:Creating a template file.
+ErrorConfigFile_File_Q_Change:Was not found or broken. Do you want to create a new file?
+File:File
+File_Cant_Open:Cant open file.
+File_Exist:Was not found.
+File_Found:File found
+GetNodeFromDic_NodeExist_Part_1:Node whoose cords are
+GetNodeFromDic_NodeExist_Part_2:Does not exist.
+HeadMenu_Available_Languages:Available languages
+HeadMenu_Edit:Edit tree
+HeadMenu_Enter_Coords:Enter coordinates of node
+HeadMenu_Exit:Exit
+HeadMenu_Header_Menu:MENU
+HeadMenu_Play:Play a game
+HeadMenu_Set_Language:Language set
+HeadMenu_Switch_Language:Switch language
+InputCoordinates_Incorrect:Incorrect coordinates. Enter again
+InputInt_Error:Enter again:
+InputStrC_Incorrect:Incorrect input, enter again!
+LoadConfigFil_Error:Config file error.
+LoadConfigFile_File_Read:The configuration file was successfully read.
+LoadLocalizationFile_All_Locale_Loaded:All localizations locaded.
+LoadLocalizationFile_Create_File:Would you like to create locale.txt.
+LoadLocalizationFile_Local_Found:Localization found.
+LoadLocalizationFile_Local_Not_Found:Localizations not found.
+LoadTreeFile_Data_Loss:Data loss.
+LoadTreeFile_Data_Part_1:The Data of
+LoadTreeFile_Data_Part_2:nodes was successfully written.
+Main_Hello:Hello world!
+PrintMenuAndChoose_Choose:Choose
+SaveToTreeFile_Write_Success:The data of all nodes was successfully written to the file
+StrToInt_Fail_Convert:Failed to convert str to int.
+no:no
+yes:yes
+ENDLOCALE
+//
+Language:Russian
+(yes/no):(yes/no)
+Begin_Animal_Part_1:Your animal
+Begin_Animal_Part_2:Its a correct answer?
+Begin_Edit:Are you want to edit this node?
+Begin_Win:I win
+EditNode_A_PS:Answer(P.S. or enter new Question)
+EditNode_Answer:Answer
+EditNode_Create_Q/A:Create Question/Answer (Create Node)
+EditNode_Edit:Edit
+EditNode_Edit_Node_Menu:EditNodeMenu
+EditNode_Enter_New:Enter new
+EditNode_Exist_Item:Exist item
+EditNode_Exit_Menu:Exit Menu
+EditNode_Go_To_No:Go to no
+EditNode_Go_To_Yes:Go to yes
+EditNode_Go_Up_The_Tree:Go up the tree
+EditNode_If_No:If no
+EditNode_If_Yes:If yes
+EditNode_Node_Exist:Node does not exist
+EditNode_Q/A:Question/Answer
+EditNode_Q_PS:Question(P.S. or enter new Answer)
+EditNode_Question:Question
+EditNode_This_Node:ThisNode
+EditNode_Type_Of_Node:Type of node
+ErrorConfigFile_File_Change:Creating a template file.
+ErrorConfigFile_File_Q_Change:Was not found or broken. Do you want to create a new file?
+File:File
+File_Cant_Open:Cant open file.
+File_Exist:Was not found.
+File_Found:File found
+GetNodeFromDic_NodeExist_Part_1:Node whoose cords are
+GetNodeFromDic_NodeExist_Part_2:Does not exist.
+HeadMenu_Available_Languages:Available languages
+HeadMenu_Edit:Edit tree
+HeadMenu_Enter_Coords:Enter coordinates of node
+HeadMenu_Exit:Exit
+HeadMenu_Header_Menu:Ã≈Õﬁ
+HeadMenu_Play:Play a game
+HeadMenu_Set_Language:Language set
+HeadMenu_Switch_Language:Switch language
+InputCoordinates_Incorrect:Incorrect coordinates. Enter again
+InputInt_Error:Enter again:
+InputStrC_Incorrect:Incorrect input, enter again!
+LoadConfigFil_Error:Config file error.
+LoadConfigFile_File_Read:The configuration file was successfully read.
+LoadLocalizationFile_All_Locale_Loaded:All localizations locaded.
+LoadLocalizationFile_Create_File:Would you like to create locale.txt.
+LoadLocalizationFile_Local_Found:Localization found.
+LoadLocalizationFile_Local_Not_Found:Localizations not found.
+LoadTreeFile_Data_Loss:Data loss.
+LoadTreeFile_Data_Part_1:The Data of
+LoadTreeFile_Data_Part_2:nodes was successfully written.
+Main_Hello:ƒ‡Ó‚‡!
+PrintMenuAndChoose_Choose:Choose
+SaveToTreeFile_Write_Success:The data of all nodes was successfully written to the file
+StrToInt_Fail_Convert:Failed to convert str to int.
+no:no
+yes:yes
+ENDLOCALE

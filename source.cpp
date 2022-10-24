@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <list>
 #include <map>
+#include <vector>
 #include <Windows.h>
 #include "Node.h"
 #define SIZE_OF_FILE_BUFF_TO_INT 20
@@ -13,16 +14,11 @@
 #define FILE_LOCALE "locale.txt"
 //
 using namespace std;
-
-enum Language
-{
-    English,
-    Russian
-};
 typedef map<string, Node> Dic;
-typedef map<pair<string, Language>, string> LocaleDic;
+typedef map<string, string> DicStr;
+typedef map<string, map<string, string>> LocaleDic; // map<wordid, map<language, word>>
 #pragma region GLOBAL_VAR
-Language glanguage;
+string glanguage = "English";
 #pragma endregion
 #pragma region OBJECTS
 Dic db;
@@ -35,9 +31,9 @@ string InputStr();
 int StrToInt(string s);
 #pragma endregion
 #pragma region DATABASE
-void AddToLocaleDic(string wordid, Language lang, string word)
+void AddToLocaleDic(string wordid, string lang, string word)
 {
-    localedb.insert(LocaleDic::value_type(make_pair(wordid, lang), word));
+    localedb[wordid][lang] = word;
 }
 void AddToDic(string Coordinates, Node Object)
 {
@@ -51,7 +47,7 @@ Node GetNodeFromDic(string Coordinates)
     }
     else
     {
-        return Node(GetWord("GetNodeFromDic_NodeExist_Part_1") + " " + Coordinates + " " + GetWord("GetNodeFromDic_NodeExist_Part_2"));
+        return Node(GetWord("GetNodeFromDic_NodeExist_Part_1") + ": " + Coordinates + " " + GetWord("GetNodeFromDic_NodeExist_Part_2"));
     }
 }
 void ReplaceItemDic(string Coordinates, Node Object)
@@ -141,7 +137,7 @@ string InputCoordinates()
     }
     if (t < s.size() || !s.starts_with(d[0]))
     {
-        PrintS(GetWord("InputCoordinates_Incorrect") + " ");
+        PrintS(GetWord("InputCoordinates_Incorrect") + ": ");
         return InputCoordinates();
     }
     return s;
@@ -163,7 +159,7 @@ int PrintMenuAndChoose(string head, list<string> ListMenu)
     }
     //  EndMenu
     PrintSL("-", 10 + head.size());
-    PrintS(GetWord("PrintMenuAndChoose_Choose") + " ");
+    PrintS(GetWord("PrintMenuAndChoose_Choose") + ": ");
     return InputInt();
 }
 void PrintMenu(string head, list<string> ListMenu)
@@ -230,30 +226,30 @@ void EditNode(string coordinates)
             if (currentnode.end)
             {
                 q_a1 = GetWord("EditNode_A_PS");
-                q_a2 = GetWord("Answer");
+                q_a2 = GetWord("EditNode_Answer");
             }
             else
             {
                 q_a1 = GetWord("EditNode_Q_PS");
-                q_a2 = GetWord("Answer");
-                chooselist.push_back("Go to Yes");
-                chooselist.push_back("Go to No");
-                menulist.push_back("If yes: " + GetNodeFromDic(coordinates + "1").question);
-                menulist.push_back("If No: " + GetNodeFromDic(coordinates + "0").question);
+                q_a2 = GetWord("EditNode_Question");
+                chooselist.push_back(GetWord("EditNode_Go_To_Yes"));
+                chooselist.push_back(GetWord("EditNode_Go_To_No"));
+                menulist.push_back(GetWord("EditNode_If_Yes") + ": " + GetNodeFromDic(coordinates + "1").question);
+                menulist.push_back(GetWord("EditNode_If_No") + ": " + GetNodeFromDic(coordinates + "0").question);
             }
-            menulist.push_front("Type of Node: " + q_a2);
+            menulist.push_front(GetWord("EditNode_Type_Of_Node") + ": " + q_a2);
             list<string>::iterator iter = menulist.begin();
             menulist.insert(++iter, q_a2 + ": " + currentnode.question);
-            chooselist.push_front("Edit " + q_a1);
+            chooselist.push_front(GetWord("EditNode_Edit") + " " + q_a1);
         }
-        chooselist.insert(++chooselist.begin(), "Go up the tree");
-        chooselist.push_back("Exit Menu");
+        chooselist.insert(++chooselist.begin(), GetWord("EditNode_Go_Up_The_Tree"));
+        chooselist.push_back(GetWord("EditNode_Exit_Menu"));
 
-        PrintMenu("ThisNode(" + coordinates + ")", menulist);
-        switch (PrintMenuAndChoose("EditNodeMenu", chooselist))
+        PrintMenu(GetWord("EditNode_This_Node") + "(" + coordinates + ")", menulist);
+        switch (PrintMenuAndChoose(GetWord("EditNode_Edit_Node_Menu"), chooselist))
         {
         case 1:
-            PrintS("Enter new " + q_a1 + ": ");
+            PrintS(GetWord("EditNode_Enter_New") + " " + q_a1 + ": ");
             currentnode = Node(InputStr());
             break;
         case 2:
@@ -279,7 +275,7 @@ void EditNode(string coordinates)
         {
             if (currentnode.end)
             {
-                PrintSL("Exist item");
+                PrintSL(GetWord("EditNode_Exist_Item"));
                 NextCoords = coordinates;
                 k = false;
             }
@@ -293,7 +289,7 @@ void EditNode(string coordinates)
         case 5:
             if (currentnode.end)
             {
-                PrintSL("Exist item");
+                PrintSL(GetWord("EditNode_Exist_Item"));
                 NextCoords = coordinates;
                 k = false;
             }
@@ -314,54 +310,123 @@ void EditNode(string coordinates)
 #pragma region Locale
 void AddLocaleList()
 {
-    AddToLocaleDic("GetNodeFromDic_NodeExist_Part_1", English, "Node whoose cords are:");
-    AddToLocaleDic("GetNodeFromDic_NodeExist_Part_2", English, "Does not exist.");
-    AddToLocaleDic("InputInt_Error", English, "Enter again:");
-    AddToLocaleDic("(yes/no)", English, "(yes/no)");
-    AddToLocaleDic("yes", English, "yes");
-    AddToLocaleDic("no", English, "no");
-    AddToLocaleDic("InputStrC_Incorrect", English, "Incorrect input, enter again!");
-    AddToLocaleDic("InputCoordinates_Incorrect", English, "Incorrect coordinates. Enter again:");
-    AddToLocaleDic("PrintMenuAndChoose_Choose", English, "Choose:");
-    AddToLocaleDic("StrToInt_Fail_Convert", English, "Failed to convert str to int.");
-    AddToLocaleDic("EditNode_Q/A", English, "Question/Answer");
-    AddToLocaleDic("EditNode_Node_Exist", English, "Node does not exist");
-    AddToLocaleDic("EditNode_Create_Q/A", English, "Create Question/Answer (Create Node)");
-    AddToLocaleDic("EditNode_A_PS", English, "Answer(P.S. or enter new Question)");
-    AddToLocaleDic("EditNode_Q_PS", English, "Question(P.S. or enter new Answer)");
-    AddToLocaleDic("Question", English, "Question");
-    AddToLocaleDic("Answer", English, "Answer");
-    AddToLocaleDic("no", English, "no");
-    AddToLocaleDic("no", English, "no");
-    AddToLocaleDic("no", English, "no");
+    AddToLocaleDic("GetNodeFromDic_NodeExist_Part_1", "English", "Node whoose cords are");
+    AddToLocaleDic("GetNodeFromDic_NodeExist_Part_2", "English", "Does not exist.");
+    AddToLocaleDic("InputInt_Error", "English", "Enter again:");
+    AddToLocaleDic("(yes/no)", "English", "(yes/no)");
+    AddToLocaleDic("yes", "English", "yes");
+    AddToLocaleDic("no", "English", "no");
+    AddToLocaleDic("InputStrC_Incorrect", "English", "Incorrect input, enter again!");
+    AddToLocaleDic("InputCoordinates_Incorrect", "English", "Incorrect coordinates. Enter again");
+    AddToLocaleDic("PrintMenuAndChoose_Choose", "English", "Choose");
+    AddToLocaleDic("StrToInt_Fail_Convert", "English", "Failed to convert str to int.");
+    AddToLocaleDic("EditNode_Q/A", "English", "Question/Answer");
+    AddToLocaleDic("EditNode_Node_Exist", "English", "Node does not exist");
+    AddToLocaleDic("EditNode_Create_Q/A", "English", "Create Question/Answer (Create Node)");
+    AddToLocaleDic("EditNode_A_PS", "English", "Answer(P.S. or enter new Question)");
+    AddToLocaleDic("EditNode_Q_PS", "English", "Question(P.S. or enter new Answer)");
+    AddToLocaleDic("EditNode_Question", "English", "Question");
+    AddToLocaleDic("EditNode_Answer", "English", "Answer");
+    AddToLocaleDic("EditNode_Go_To_Yes", "English", "Go to yes");
+    AddToLocaleDic("EditNode_Go_To_No", "English", "Go to no");
+    AddToLocaleDic("EditNode_If_Yes", "English", "If yes");
+    AddToLocaleDic("EditNode_If_No", "English", "If no");
+    AddToLocaleDic("EditNode_Type_Of_Node", "English", "Type of node");
+    AddToLocaleDic("EditNode_Edit", "English", "Edit");
+    AddToLocaleDic("EditNode_Go_Up_The_Tree", "English", "Go up the tree");
+    AddToLocaleDic("EditNode_Exit_Menu", "English", "Exit Menu");
+    AddToLocaleDic("EditNode_This_Node", "English", "ThisNode");
+    AddToLocaleDic("EditNode_Edit_Node_Menu", "English", "EditNodeMenu");
+    AddToLocaleDic("EditNode_Enter_New", "English", "Enter new");
+    AddToLocaleDic("EditNode_Exist_Item", "English", "Exist item");
+    AddToLocaleDic("File_Exist", "English", "Was not found.");
+    AddToLocaleDic("ErrorConfigFile_File_Q_Change", "English", "Was not found or broken. Do you want to create a new file?");
+    AddToLocaleDic("ErrorConfigFile_File_Change", "English", "Creating a template file.");
+    AddToLocaleDic("LoadConfigFil_Error", "English", "Config file error.");
+    AddToLocaleDic("File", "English", "File");
+    AddToLocaleDic("File_Found", "English", "File found");
+    AddToLocaleDic("LoadConfigFile_File_Read", "English", "The configuration file was successfully read.");
+    AddToLocaleDic("LoadLocalizationFile_Local_Found", "English", "Localization found.");
+    AddToLocaleDic("LoadLocalizationFile_Local_Not_Found", "English", "Localizations not found.");
+    AddToLocaleDic("LoadLocalizationFile_Create_File", "English", "Would you like to create locale.txt.");
+    AddToLocaleDic("File_Cant_Open", "English", "Cant open file.");
+    AddToLocaleDic("SaveToTreeFile_Write_Success", "English", "The data of all nodes was successfully written to the file");
+    AddToLocaleDic("LoadTreeFile_Data_Part_1", "English", "The Data of");
+    AddToLocaleDic("LoadTreeFile_Data_Part_2", "English", "nodes was successfully written.");
+    AddToLocaleDic("LoadTreeFile_Data_Loss", "English", "Data loss.");
+    AddToLocaleDic("Begin_Animal_Part_1", "English", "Your animal");
+    AddToLocaleDic("Begin_Animal_Part_2", "English", "Its a correct answer?");
+    AddToLocaleDic("Begin_Win", "English", "I win");
+    AddToLocaleDic("Begin_Edit", "English", "Are you want to edit this node?");
+    AddToLocaleDic("HeadMenu_Header_Menu", "English", "MENU");
+    AddToLocaleDic("HeadMenu_Play", "English", "Play a game");
+    AddToLocaleDic("HeadMenu_Edit", "English", "Edit tree");
+    AddToLocaleDic("HeadMenu_Exit", "English", "Exit");
+    AddToLocaleDic("HeadMenu_Enter_Coords", "English", "Enter coordinates of node");
+    AddToLocaleDic("Main_Hello", "English", "Hello world!");
+    AddToLocaleDic("LoadLocalizationFile_All_Locale_Loaded", "English", "All localizations locaded.");
+    AddToLocaleDic("HeadMenu_Switch_Language", "English", "Switch language");
+    AddToLocaleDic("HeadMenu_Available_Languages", "English", "Available languages");
+    AddToLocaleDic("HeadMenu_Set_Language", "English", "Language set");
 }
 string GetWord(string wordid)
 {
-    if (localedb.contains(make_pair(wordid, glanguage)))
-        return localedb[make_pair(wordid, glanguage)];
+    if (localedb.contains(wordid))
+    {
+        if (localedb[wordid].contains(glanguage))
+            return localedb[wordid][glanguage];
+        else
+            return localedb[wordid]["English"];
+    }
     else
-        return localedb[make_pair(wordid, English)];
+    {
+        return wordid + "-Not Found";
+    }
 }
 #pragma endregion
 #pragma region FILE
+bool OpenFileInput(ifstream &file, string path)
+{
+    file.open(path);
+    if (!file.is_open())
+    {
+        PrintS(GetWord("File") + ": ");
+        PrintS(path);
+        PrintSL(" " + GetWord("File_Exist"));
+        return 0;
+    }
+    else
+    {
+        PrintS(GetWord("File_Found") + ": ");
+        PrintSL(path);
+        return 1;
+    }
+}
 void ErrorConfigFile()
 {
-    PrintS("Файл: ");
+    PrintS(GetWord("File") + ": ");
     PrintS(FILE_CONFIG);
-    PrintSL(" Не был найден, или в нем есть ошибка. Создание или изменение файла по шаблону");
-    ofstream fout(FILE_CONFIG);
-    fout << "//CONFIGURATION FILE\n"
-         << "StartLanguage: English\n"
-         << "ENDCONFIG\n";
-    glanguage = English;
+    PrintSL(" " + GetWord("ErrorConfigFile_File_Q_Change"));
+    if (InputStrC())
+    {
+        PrintSL(GetWord("ErrorConfigFile_File_Change"));
+        ofstream fout(FILE_CONFIG);
+        fout << "//CONFIGURATION FILE\n"
+             << "StartLanguage: English\n"
+             << "ENDCONFIG\n";
+        glanguage = "English";
+        fout.close();
+    }
+    else
+    {
+        exit(-1);
+    }
 }
 void LoadConfigFile()
 {
-    ifstream fin(FILE_CONFIG);
-    if (fin.is_open())
+    ifstream fin;
+    if (OpenFileInput(fin, FILE_CONFIG))
     {
-        PrintS("Обнаружен файл: ");
-        PrintSL(FILE_CONFIG);
         string s;
         int amountconfig = 1;
         do
@@ -376,13 +441,13 @@ void LoadConfigFile()
                 if (s.find("English") != string::npos)
                 {
                     PrintSL("Language: English");
-                    glanguage = English;
+                    glanguage = "English";
                     amountconfig--;
                 }
                 else if (s.find("Russian") != string::npos)
                 {
                     PrintSL("Язык: Русский");
-                    glanguage = Russian;
+                    glanguage = "Russian";
                     amountconfig--;
                 }
             }
@@ -390,17 +455,19 @@ void LoadConfigFile()
             {
                 if (amountconfig == 0)
                 {
-                    PrintSL("Конфигурационный файл успешно считан.");
+                    PrintSL(GetWord("LoadConfigFile_File_Read"));
                     break;
                 }
                 else
                 {
+                    PrintSL(GetWord("LoadConfigFil_Error"));
                     ErrorConfigFile();
                     break;
                 }
             }
             else
             {
+                PrintSL(GetWord("LoadConfigFil_Error"));
                 ErrorConfigFile();
                 break;
             }
@@ -410,21 +477,26 @@ void LoadConfigFile()
     {
         ErrorConfigFile();
     }
+    fin.close();
+}
+void CreateLocalizationFile()
+{
+    ofstream fout(FILE_LOCALE);
+    fout << "Language:English\n";
+    for (auto &&e : localedb)
+    {
+        fout << e.first + ":" + e.second["English"] + "\n";
+    }
+    fout << "ENDLOCALE\0";
+    fout.close();
 }
 void LoadLocalizationFile()
 {
-    ifstream fin(FILE_LOCALE);
-    if (!fin.is_open())
+    ifstream fin;
+    if (OpenFileInput(fin, FILE_LOCALE))
     {
-        PrintS("Файл: ");
-        PrintS(FILE_LOCALE);
-        PrintSL(" Не был найден.");
-    }
-    else
-    {
-        PrintS("Обнаружен файл: ");
-        PrintSL(FILE_LOCALE);
         string s;
+        int localizations = 0;
         do
         {
             getline(fin, s);
@@ -434,27 +506,77 @@ void LoadLocalizationFile()
             }
             else if (s.find("Language:") != string::npos)
             {
-                if (s.find("Russian") != string::npos)
+                string language = s.substr(s.find(":") + 1);
+                PrintSL(language + " " + GetWord("LoadLocalizationFile_Local_Found"));
+                while (true)
                 {
-                    PrintSL("Русская локализация найдена");
                     getline(fin, s);
+                    if (s.find(":") != string::npos)
+                    {
+                        AddToLocaleDic(s.substr(0, s.find(":")), language, s.substr(s.find(":") + 1));
+                    }
+                    else if (s.find("ENDLOCALE") != string::npos)
+                    {
+                        break;
+                        //проверка на правильность и колво заполнения
+                    }
+                    else
+                    {
+                        PrintSL(GetWord("LoadLocalizationFile_Create_File"));
+                        if (InputStrC())
+                        {
+                            CreateLocalizationFile();
+                            fin.close();
+                            return;
+                        }
+                        else
+                        {
+                            exit(-1);
+                        }
+                    }
                 }
-                break;
+            }
+            else if (s.find("ENDLOCALE") != string::npos)
+            {
+                PrintSL(GetWord("LoadLocalizationFile_All_Locale_Loaded"));
+                return;
             }
             else
             {
-                PrintSL("Локализаций не было найдено, использование English");
-                break;
+                PrintSL(GetWord("LoadLocalizationFile_Local_Not_Found"));
+                PrintSL(GetWord("LoadLocalizationFile_Create_File"));
+                if (InputStrC())
+                {
+                    CreateLocalizationFile();
+                    fin.close();
+                    return;
+                }
+                else
+                    exit(-1);
             }
         } while (true);
     }
+    else
+    {
+        PrintSL(GetWord("LoadLocalizationFile_Create_File"));
+        if (InputStrC())
+        {
+            CreateLocalizationFile();
+            fin.close();
+            return;
+        }
+        else
+            exit(-1);
+    }
+    fin.close();
+    return;
 }
 void SaveToTreeFile()
 {
-    ofstream fout("tree.txt");
+    ofstream fout(FILE_TREE);
     if (!fout.is_open())
     {
-        PrintSL("Не удалось открыть файл");
+        PrintSL(GetWord("File_Cant_Open"));
     }
     else
     {
@@ -464,17 +586,14 @@ void SaveToTreeFile()
             fout << element.first << " " << element.second.question << "\n";
         }
         fout.close();
-        PrintSL("Данные всех узлов были успешно записаны в файл");
+        PrintSL(GetWord("SaveToTreeFile_Write_Success"));
     }
+    fout.close();
 }
 void LoadTreeFile()
 {
-    ifstream fin("tree.txt");
-    if (!fin.is_open())
-    {
-        PrintSL("Не удалось открыть файл");
-    }
-    else
+    ifstream fin;
+    if (OpenFileInput(fin, FILE_TREE))
     {
         int amountofnodes;
         string s;
@@ -493,10 +612,11 @@ void LoadTreeFile()
             AddToDic(s.substr(0, space), Node(s.substr(space)));
         }
         if (db.size() == amountofnodes)
-            PrintSL("Данные " + to_string(amountofnodes) + " узлов были успешно загружены!");
+            PrintSL(GetWord("LoadTreeFile_Data_Part_1") + " " + to_string(amountofnodes) + " " + GetWord("LoadTreeFile_Data_Part_2"));
         else
-            PrintSL("Потеря данных");
+            PrintSL(GetWord("LoadTreeFile_Data_Loss"));
     }
+    fin.close();
 }
 #pragma endregion
 void Begin()
@@ -518,15 +638,15 @@ void Begin()
         }
         node = GetNodeFromDic(coordinates);
     }
-    PrintS("Your animal: " + node.question + "\nIts a correct answer?");
+    PrintS(GetWord("Begin_Animal_Part_1") + ": " + node.question + "\n" + GetWord("Begin_Animal_Part_2"));
     answer = InputStrC();
     if (answer)
     {
-        PrintSL("I win");
+        PrintSL(GetWord("Begin_Win"));
     }
     else
     {
-        PrintS("Are you want to edit this node?");
+        PrintS(GetWord("Begin_Edit"));
         if (InputStrC())
         {
             EditNode(coordinates);
@@ -535,19 +655,46 @@ void Begin()
 }
 int HeadMenu()
 {
-    switch (PrintMenuAndChoose("MENU",
-                               {"Play a game",
-                                "Edit tree",
-                                "Exit"}))
+    switch (PrintMenuAndChoose(GetWord("HeadMenu_Header_Menu"),
+                               {GetWord("HeadMenu_Play"),
+                                GetWord("HeadMenu_Edit"),
+                                GetWord("HeadMenu_Switch_Language"),
+                                GetWord("HeadMenu_Exit")}))
     {
     case 1: // Play a game
         Begin();
         break;
     case 2: // Edit tree
-        PrintS("Enter coordinates of node: ");
+        PrintS(GetWord("HeadMenu_Enter_Coords") + ": ");
         EditNode(InputCoordinates());
         break;
     case 3:
+    {
+        PrintS(GetWord("HeadMenu_Available_Languages") + ": ");
+        vector<string> l;
+        for (auto e : localedb["Main_Hello"])
+        {
+            l.push_back(e.first);
+        }
+        PrintS(l[0]);
+        for (int i = 1; i < l.size(); i++)
+        {
+            PrintS(", " + l[i]);
+        }
+        PrintSL(".");
+        PrintS(GetWord("PrintMenuAndChoose_Choose") + ": ");
+        string clanguage = InputStr();
+        for (auto k : l)
+        {
+            if (clanguage == k)
+            {
+                glanguage = clanguage;
+                PrintSL(GetWord("HeadMenu_Set_Language") + ": " + glanguage);
+            }
+        }
+    }
+    break;
+    case 4:
         return 0;
         break;
     }
@@ -559,11 +706,11 @@ int main()
 {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
-    LoadConfigFile();
     AddLocaleList();
+    LoadConfigFile();
     LoadLocalizationFile();
     LoadTreeFile();
-    PrintSL("Добрый ветер!");
+    PrintSL(GetWord("Main_Hello"));
     while (HeadMenu())
         ;
     SaveToTreeFile();
